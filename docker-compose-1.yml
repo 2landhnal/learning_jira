@@ -3,7 +3,6 @@ volumes:
   n8n_storage:
   pgdata:
   jiraVolume:
-  redis_data:
 
 services:
   postgres:
@@ -70,24 +69,17 @@ services:
      - ATL_PROXY_NAME=jira.internal
      - ATL_PROXY_PORT=80
      - ATL_TOMCAT_SCHEME=http 
-    ports: 
-     - "8888:80" 
     volumes:
      - jiraVolume:/var/atlassian/application-data/jira
 
-  redis:
-    container_name: redis
-    image: redis:8.2-rc1-alpine
-    restart: always
-    volumes:
-      - redis_data:/data
-  # jira-mcp:
-  #   container_name: jira-mcp 
-  #   image: ghcr.io/sooperset/mcp-atlassian:latest 
-  #   environment:
-  #   - JIRA_URL=http://jira.internal
-  #   command: --transport streamable-http -vv
-  #   ports: 
-  #    - "8000:8000" 
-  #   depends_on:
-  #     - jira
+  jira-mcp:
+    container_name: jira-mcp 
+    image: ghcr.io/sooperset/mcp-atlassian:latest 
+    environment:
+    - JIRA_URL=http://jira.internal
+    # - JIRA_PERSONAL_TOKEN
+    - TRANSPORT=sse
+    ports: 
+    - "8000:8000" 
+    depends_on:
+      - jira
