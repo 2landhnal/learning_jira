@@ -1,2 +1,5 @@
 node_modules
 .env
+postgres_data
+redis_data
+jira_data
