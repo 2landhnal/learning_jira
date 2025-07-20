@@ -74,3 +74,8 @@ services:
     restart: always
     volumes:
       - ./redis_data:/data
+
+  curl:
+    container_name: curl
+    image: alpine/curl:8.14.1
+    command: ["curl", "-fsSL", "https://www.google.com/"]

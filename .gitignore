@@ -3,3 +3,4 @@ node_modules
 postgres_data
 redis_data
 jira_data
+__pycache__

@@ -1,0 +1,264 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -384,
+        -32
+      ],
+      "id": "f7752dec-d7f7-4896-abee-64731b612f42",
+      "name": "When chat message received",
+      "webhookId": "f95b27f1-a76c-43ea-a4f7-b65814e00250"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        464,
+        -32
+      ],
+      "id": "21a8bff1-c148-44cb-a285-35a6394beb5e",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "connectionType": "http"
+      },
+      "type": "n8n-nodes-mcp.mcpClientTool",
+      "typeVersion": 1,
+      "position": [
+        832,
+        208
+      ],
+      "id": "f991e440-ac3c-4ff9-bea4-cfae514efbcd",
+      "name": "MCP Client",
+      "alwaysOutputData": false,
+      "credentials": {
+        "mcpClientHttpApi": {
+          "id": "H32Z8RGyHJw6IZzg",
+          "name": "MCP Client (HTTP Streamable) account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "connectionType": "http",
+        "operation": "executeTool",
+        "toolName": "={{ $fromAI(\"tool\", \"Populate this with the tool name from the list tools result\") }}",
+        "toolParameters": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Tool_Parameters', ``, 'json') }}"
+      },
+      "type": "n8n-nodes-mcp.mcpClientTool",
+      "typeVersion": 1,
+      "position": [
+        688,
+        208
+      ],
+      "id": "32d96264-d8a4-4a15-a991-8565fa0f5505",
+      "name": "MCP Client1",
+      "alwaysOutputData": false,
+      "credentials": {
+        "mcpClientHttpApi": {
+          "id": "H32Z8RGyHJw6IZzg",
+          "name": "MCP Client (HTTP Streamable) account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        320,
+        176
+      ],
+      "id": "a2f20106-9439-451b-bb48-b1074e1f1da4",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "kDzLRzOucifdAxXj",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        512,
+        176
+      ],
+      "id": "f6d4f6d2-6916-4008-b036-b47e81300aa1",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:5678/webhook/redis",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "key",
+              "value": "2land"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -224,
+        96
+      ],
+      "id": "82153651-1ce6-4a2c-aa76-ce1378e2a490",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        256,
+        -16
+      ],
+      "id": "6f9c3de4-0f5b-425e-93e4-82636e31bc30",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "dc2512f5-ab1d-4a4f-adb4-3ca88909d028",
+              "name": "pat",
+              "value": "={{ $json.value }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -16,
+        96
+      ],
+      "id": "1da77808-782b-4444-9cc3-a8c8e5bdaa25",
+      "name": "Edit Fields"
+    }
+  ],
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MCP Client": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MCP Client1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        []
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "97cdaab89af73ebd5970b4d23e9d1859d7eb3b935c78db3eb6127ddba5b4902d"
+  }
+}

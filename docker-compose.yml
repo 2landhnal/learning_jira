@@ -72,19 +72,13 @@ services:
 
   jira-mcp:
     container_name: jira-mcp 
-    image: 2land/my-atlassian-mcp:v0
+    image: ghcr.io/sooperset/mcp-atlassian:latest
     environment:
     - JIRA_URL=http://jira.internal
-    - JIRA_PERSONAL_TOKEN
-    - TRANSPORT=sse
-    - MCP_VERBOSE=true       
-    - MCP_VERY_VERBOSE=true  
-    - MCP_LOGGING_STDOUT=true
-    - REDIS_BASE=redis
-    - REDIS_PORT=6379
-    - REDIS_PAT_KEY=pat
-    ports: 
-    - "8001:8000" 
+    - TRANSPORT=streamable-http
+    env_file:
+      - .env
+    command: ["--transport", "streamable-http", "--port", "9000", "-vv"]
     depends_on:
       - jira
 
@@ -96,3 +90,9 @@ services:
       - ./redis_data:/data
     ports:
       - "6380:6379"
+
+  curl:
+    container_name: curl
+    image: alpine/curl:8.14.1
+    command: ["tail", "-f", "/dev/null"]  # Keeps container running indefinitely
+    # Alternative: command: ["sleep", "infinity"]

@@ -1,0 +1,209 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "redis",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -144,
+        -16
+      ],
+      "id": "bb8bf655-7633-43cd-b0a8-993ce3baea6a",
+      "name": "Webhook",
+      "webhookId": "46fc598a-dd0e-4b1e-a8b2-c2e476b4a45d"
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "={{ $json[\"body\"][\"key\"] }}",
+        "value": "={{ $json[\"body\"][\"value\"] }}",
+        "keyType": "string"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        64,
+        -16
+      ],
+      "id": "ced77915-eade-4da1-888c-56c784168c64",
+      "name": "Redis",
+      "credentials": {
+        "redis": {
+          "id": "7QnvFQv7gN6svCsP",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"{{ $json['body']['key'] }}\": \"{{ $json['body']['value'] }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        272,
+        -16
+      ],
+      "id": "b912221c-341a-42ab-8959-502aefa72351",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:5678/webhook/redis",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "key",
+              "value": "2land"
+            },
+            {
+              "name": "value",
+              "value": "NTgyMDI5NDU3Njk1Oo6X9ZUsv7ysg47UBvtCCqz0ceD1"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        480,
+        0
+      ],
+      "id": "7ea861a6-3df0-483e-a396-d019842de750",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "path": "redis",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -144,
+        192
+      ],
+      "id": "330463a9-72c6-4f03-88ae-3a80e1b2ba0b",
+      "name": "Webhook1",
+      "webhookId": "46fc598a-dd0e-4b1e-a8b2-c2e476b4a45d"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "propertyName": "value",
+        "key": "={{ $json['query']['key'] }}",
+        "keyType": "string",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        64,
+        192
+      ],
+      "id": "f7dde3d6-846a-4a6f-9e23-a500f2458813",
+      "name": "Redis1",
+      "credentials": {
+        "redis": {
+          "id": "7QnvFQv7gN6svCsP",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        272,
+        192
+      ],
+      "id": "840b9430-4b89-48df-8d30-2e277f072534",
+      "name": "Respond to Webhook1"
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:5678/webhook/redis?key=2land",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        512,
+        224
+      ],
+      "id": "f25cc2e9-4fa3-4ab6-b154-c900f671a771",
+      "name": "HTTP Request1"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Redis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond to Webhook": {
+      "main": [
+        []
+      ]
+    },
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "Redis1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis1": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "97cdaab89af73ebd5970b4d23e9d1859d7eb3b935c78db3eb6127ddba5b4902d"
+  }
+}
